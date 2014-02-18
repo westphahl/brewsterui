@@ -53,10 +53,6 @@ void BrewsterClient::setPumpState(bool pumpState)
 {
     qDebug() << Q_FUNC_INFO << pumpState;
     writeSocketData(QVariantList() << (quint8) PumpState << pumpState);
-    if (_pumpState != pumpState) {
-        _pumpState = pumpState;
-        emit pumpStateChanged(pumpState);
-    }
 }
 
 void BrewsterClient::setHeaterOutput(quint8 level)
@@ -87,7 +83,13 @@ void BrewsterClient::handleMessage(const QVariant &message)
     MessageType messageType = (MessageType) paramList.takeFirst().value<quint8>();
     switch (messageType) {
     case PumpState: {
-        // TODO: Set pump state
+        if (!paramList.isEmpty()) {
+            QVariant pumpState = paramList.takeFirst();
+            if (pumpState.type() == QMetaType::Bool) {
+                _pumpState = pumpState.toBool();
+                emit pumpStateChanged(_pumpState);
+            }
+        }
         break;
     }
     case HeaterOutput: {
