@@ -54,4 +54,44 @@ Item {
         horizontalAlignment: Text.AlignRight
         font.pixelSize: 18
     }
+
+    Text {
+        id: tempLabel
+        x: 299
+        y: 39
+        text: qsTr("Kesseltemperatur")
+        font.pixelSize: 18
+    }
+
+    Text {
+        id: heaterLabel
+        x: 41
+        y: 275
+        text: qsTr("Heizleistung")
+        font.pixelSize: 18
+    }
+
+    Slider {
+        id: heaterLevelSlider
+        x: 41
+        y: 352
+        width: 418
+        height: 28
+        tickmarksEnabled: true
+        updateValueWhileDragging: false
+        minimumValue: 0
+        maximumValue: 100
+        stepSize: 2
+    }
+
+    ProgressBar {
+        id: heaterLevel
+        x: 41
+        y: 317
+        width: 418
+        height: 23
+        value: 0
+        minimumValue: 0
+        maximumValue: 100
+    }
 }
