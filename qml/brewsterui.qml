@@ -30,12 +30,14 @@ Item {
         Connections {
             target: brewster
             onPumpStateChanged: {
-                console.log("onPumpStateChanged: " + state)
                 if (state) {
                     pumpState.state = "OFF"
                 } else {
                     pumpState.state = "ON"
                 }
+            }
+            onTemperatureChanged: {
+                kettleTemp.text = Number(temp).toFixed(1)
             }
         }
 
@@ -62,5 +64,24 @@ Item {
         x: 41
         y: 71
         onToggle: brewster.setPumpState(active)
+    }
+
+    Text {
+        id: tempUnit
+        x: 411
+        y: 39
+        text: qsTr("°C")
+        font.pixelSize: 18
+    }
+
+    Text {
+        id: kettleTemp
+        x: 346
+        y: 39
+        width: 59
+        height: 26
+        text: ""
+        horizontalAlignment: Text.AlignRight
+        font.pixelSize: 18
     }
 }
