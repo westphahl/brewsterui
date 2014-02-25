@@ -38,19 +38,19 @@ Item {
 
     Text {
         id: tempUnit
-        x: 411
-        y: 39
+        x: 437
+        y: 71
         text: qsTr("°C")
         font.pixelSize: 18
     }
 
     Text {
         id: kettleTemp
-        x: 346
-        y: 39
+        x: 372
+        y: 71
         width: 59
         height: 26
-        text: ""
+        text: "n/a"
         horizontalAlignment: Text.AlignRight
         font.pixelSize: 18
     }
