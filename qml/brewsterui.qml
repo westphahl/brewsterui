@@ -15,48 +15,18 @@ Item {
         font.pixelSize: 18
     }
 
-    Rectangle {
-        id: pumpState
-        x: 123
-        y: 53
-        width: 76
-        height: 57
-        color: "#cccccc"
-        radius: 10
-        anchors.top: parent.top
-        anchors.topMargin: 39
-        border.color: "#00000000"
-
-        Connections {
-            target: brewster
-            onPumpStateChanged: {
-                if (state) {
-                    pumpState.state = "OFF"
-                } else {
-                    pumpState.state = "ON"
-                }
-            }
-            onTemperatureChanged: {
-                kettleTemp.text = Number(temp).toFixed(1)
+    Connections {
+        target: brewster
+        onPumpStateChanged: {
+            if (state) {
+                pumpSwitch.backgroundColor = "#61c850"
+            } else {
+                pumpSwitch.backgroundColor = "#dc3737"
             }
         }
-
-        states: [
-            State {
-                name: "ON"
-                PropertyChanges {
-                    target: pumpState
-                    color: "#dc3737"
-                }
-            },
-            State {
-                name: "OFF"
-                PropertyChanges {
-                    target: pumpState
-                    color: "#61c850"
-                }
-            }
-        ]
+        onTemperatureChanged: {
+            kettleTemp.text = Number(temp).toFixed(1)
+        }
     }
 
     ToggleSwitch {

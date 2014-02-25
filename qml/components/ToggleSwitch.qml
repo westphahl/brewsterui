@@ -4,7 +4,10 @@ import QtQuick.Controls 1.1
 Item {
     id: toggleSwitch
 
+    property color backgroundColor
     signal toggle(bool active)
+
+    onBackgroundColorChanged: switchBackground.color = backgroundColor
 
     x: 0
     y: 0
@@ -20,10 +23,6 @@ Item {
             PropertyChanges {
                 target: switchButton
                 x: switchButton.width
-            }
-            PropertyChanges {
-                target: switchBackground
-                color: switchColor.highlight
             }
         }
     ]
