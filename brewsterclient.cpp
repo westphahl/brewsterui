@@ -57,10 +57,8 @@ void BrewsterClient::setPumpState(bool pumpState)
 
 void BrewsterClient::setHeaterOutput(quint8 level)
 {
-    if (_heaterOutput != level) {
-        _heaterOutput = level;
-        emit heaterOutputChanged(_heaterOutput);
-    }
+    qDebug() << Q_FUNC_INFO << level;
+    writeSocketData(QVariantList() << (quint8) HeaterOutput << level);
 }
 
 void BrewsterClient::setTemperature(float temp)
@@ -90,7 +88,13 @@ void BrewsterClient::handleMessage(const QVariant &message)
         break;
     }
     case HeaterOutput: {
-        // TODO: Set heater output
+        if (!paramList.isEmpty()) {
+            QVariant heaterLevel = paramList.takeFirst();
+            if (heaterLevel.type() == QMetaType::Int) {
+                _heaterOutput = heaterLevel.toInt();
+                emit heaterOutputChanged(_heaterOutput);
+            }
+        }
         break;
     }
     case KettleTemperature: {

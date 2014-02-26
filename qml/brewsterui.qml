@@ -27,6 +27,9 @@ Item {
         onTemperatureChanged: {
             kettleTemp.text = Number(temp).toFixed(1)
         }
+        onHeaterOutputChanged: {
+            heaterLevel.value = level
+        }
     }
 
     ToggleSwitch {
@@ -82,6 +85,7 @@ Item {
         minimumValue: 0
         maximumValue: 100
         stepSize: 2
+        onValueChanged: brewster.setHeaterOutput(heaterLevelSlider.value)
     }
 
     ProgressBar {
