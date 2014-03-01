@@ -14,7 +14,7 @@ OTHER_FILES += \
     qml/main.qml \
     qml/connectdialog.qml \
     qml/brewsterui.qml \
-    qml/components/ToggleSwitch.qml
+    qml/ToggleSwitch.qml
 
 RESOURCES += \
     brewsterui.qrc

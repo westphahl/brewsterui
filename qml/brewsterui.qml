@@ -1,8 +1,6 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
 
-import "components"
-
 Item {
     height: 500
     width: 500

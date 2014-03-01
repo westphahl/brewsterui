@@ -3,6 +3,6 @@
         <file>qml/main.qml</file>
         <file>qml/connectdialog.qml</file>
         <file>qml/brewsterui.qml</file>
-        <file>qml/components/ToggleSwitch.qml</file>
+        <file>qml/ToggleSwitch.qml</file>
     </qresource>
 </RCC>
