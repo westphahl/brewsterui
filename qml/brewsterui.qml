@@ -17,8 +17,10 @@ Item {
         target: brewster
         onPumpStateChanged: {
             if (state) {
+                pumpSwitch.setState(true)
                 pumpSwitch.backgroundColor = "#61c850"
             } else {
+                pumpSwitch.setState(false)
                 pumpSwitch.backgroundColor = "#dc3737"
             }
         }
@@ -27,6 +29,7 @@ Item {
         }
         onHeaterOutputChanged: {
             heaterLevel.value = level
+            heaterLevelSlider.value = level
         }
     }
 

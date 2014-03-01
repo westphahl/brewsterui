@@ -9,6 +9,14 @@ Item {
 
     onBackgroundColorChanged: switchBackground.color = backgroundColor
 
+    function setState(enabled) {
+        if (enabled) {
+            toggleSwitch.state = "ON"
+        } else {
+            toggleSwitch.state = ""
+        }
+    }
+
     x: 0
     y: 0
     width: 70
