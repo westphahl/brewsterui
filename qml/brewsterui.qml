@@ -122,6 +122,21 @@ Item {
         font.pixelSize: 18
     }
 
+    Button {
+        id: saveProtocolButton
+        x: 140
+        y: 329
+        text: qsTr("Speichern...")
+        onClicked: protocolFileDialog.open()
+    }
+
+    FileDialog {
+        id: protocolFileDialog
+        title: qsTr("Speicherort auswählen")
+        selectExisting: false
+        onAccepted: brewster.saveProtocol(protocolFileDialog.fileUrl, JSON.stringify(dataModel))
+    }
+
     MessageDialog {
         id: clearProtocolDialog
         icon: StandardIcon.Critical

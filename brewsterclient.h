@@ -39,6 +39,8 @@ public slots:
     void setHeaterOutput(quint8 level);
     void setPumpState(bool pumpState);
 
+    void saveProtocol(const QUrl &fileUrl, const QByteArray &json);
+
 private slots:
     void setTemperature(float temp);
     void onDataAvailable();

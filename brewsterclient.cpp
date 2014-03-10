@@ -55,6 +55,17 @@ void BrewsterClient::setPumpState(bool pumpState)
     writeSocketData(QVariantList() << (quint8) PumpState << pumpState);
 }
 
+void BrewsterClient::saveProtocol(const QUrl &fileUrl, const QByteArray &json)
+{
+    qDebug() << Q_FUNC_INFO;
+    QFile protocolFile(fileUrl.toLocalFile());
+    if (!protocolFile.open(QIODevice::WriteOnly))
+        return;
+
+    protocolFile.write(json);
+    protocolFile.close();
+}
+
 void BrewsterClient::setHeaterOutput(quint8 level)
 {
     qDebug() << Q_FUNC_INFO << level;
