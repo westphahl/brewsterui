@@ -26,6 +26,10 @@ Item {
         }
         onTemperatureChanged: {
             kettleTemp.text = Number(temp).toFixed(1)
+            dataModel.append({
+                temperature: Number(temp).toFixed(1),
+                timestamp: new Date
+            })
         }
         onHeaterOutputChanged: {
             heaterLevel.value = level
@@ -103,5 +107,9 @@ Item {
             text: parent.value + " %"
             anchors.centerIn: parent
         }
+    }
+
+    ListModel {
+        id: dataModel
     }
 }
