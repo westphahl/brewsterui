@@ -70,7 +70,7 @@ Item {
     Text {
         id: heaterLabel
         x: 41
-        y: 275
+        y: 134
         text: qsTr("Heizleistung")
         font.pixelSize: 18
     }
@@ -78,7 +78,7 @@ Item {
     Slider {
         id: heaterLevelSlider
         x: 41
-        y: 352
+        y: 211
         width: 418
         height: 28
         tickmarksEnabled: true
@@ -92,11 +92,16 @@ Item {
     ProgressBar {
         id: heaterLevel
         x: 41
-        y: 317
+        y: 176
         width: 418
         height: 23
         value: 0
         minimumValue: 0
         maximumValue: 100
+
+        Text {
+            text: parent.value + " %"
+            anchors.centerIn: parent
+        }
     }
 }
