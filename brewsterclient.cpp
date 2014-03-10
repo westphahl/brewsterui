@@ -46,6 +46,8 @@ void BrewsterClient::initialize(QString host, quint16 port)
 
 void BrewsterClient::onSocketError(QAbstractSocket::SocketError socketError)
 {
+    Q_UNUSED(socketError);
+
     emit error(socket->errorString());
 }
 
@@ -91,7 +93,7 @@ void BrewsterClient::handleMessage(const QVariant &message)
     case PumpState: {
         if (!paramList.isEmpty()) {
             QVariant pumpState = paramList.takeFirst();
-            if (pumpState.type() == QMetaType::Bool) {
+            if (static_cast<QMetaType::Type>(pumpState.type()) == QMetaType::Bool) {
                 _pumpState = pumpState.toBool();
                 emit pumpStateChanged(_pumpState);
             }
@@ -101,7 +103,7 @@ void BrewsterClient::handleMessage(const QVariant &message)
     case HeaterOutput: {
         if (!paramList.isEmpty()) {
             QVariant heaterLevel = paramList.takeFirst();
-            if (heaterLevel.type() == QMetaType::Int) {
+            if (static_cast<QMetaType::Type>(heaterLevel.type()) == QMetaType::Int) {
                 _heaterOutput = heaterLevel.toInt();
                 emit heaterOutputChanged(_heaterOutput);
             }
@@ -111,7 +113,7 @@ void BrewsterClient::handleMessage(const QVariant &message)
     case KettleTemperature: {
         if (!paramList.isEmpty()) {
             QVariant kettleTemperature = paramList.takeFirst();
-            if (kettleTemperature.type() == QMetaType::Float) {
+            if (static_cast<QMetaType::Type>(kettleTemperature.type()) == QMetaType::Float) {
                 _temperature = kettleTemperature.toFloat();
                 emit temperatureChanged(_temperature);
             }
