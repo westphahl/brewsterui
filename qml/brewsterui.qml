@@ -1,5 +1,6 @@
 import QtQuick 2.2
 import QtQuick.Controls 1.1
+import QtQuick.Dialogs 1.1
 
 Item {
     height: 500
@@ -111,5 +112,30 @@ Item {
 
     ListModel {
         id: dataModel
+    }
+
+    Text {
+        id: protocolLabel
+        x: 41
+        y: 292
+        text: qsTr("Protokoll")
+        font.pixelSize: 18
+    }
+
+    MessageDialog {
+        id: clearProtocolDialog
+        icon: StandardIcon.Critical
+        title: qsTr("Löschen bestätigen")
+        text: qsTr("Protokolldaten wirklich löschen?")
+        standardButtons: StandardButton.Yes | StandardButton.No
+        onYes: dataModel.clear()
+    }
+
+    Button {
+        id: clearProtocolButton
+        x: 41
+        y: 329
+        text: qsTr("Löschen")
+        onClicked: clearProtocolDialog.open()
     }
 }
