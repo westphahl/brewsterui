@@ -27,10 +27,6 @@ Item {
         }
         onTemperatureChanged: {
             kettleTemp.text = Number(temp).toFixed(1)
-            dataModel.append({
-                temperature: Number(temp).toFixed(1),
-                timestamp: new Date
-            })
         }
         onHeaterOutputChanged: {
             heaterLevel.value = level
@@ -110,8 +106,27 @@ Item {
         }
     }
 
+    // Protocol
+
     ListModel {
         id: dataModel
+    }
+
+    Timer {
+        id: protocolTimer
+        interval: 1000;
+        repeat: true
+        running: true
+        triggeredOnStart: true
+
+        onTriggered: {
+            dataModel.append({
+                "pump_state": brewster.pumpState,
+                "heater_level": brewster.heaterOutput,
+                "temperature": Number(brewster.temperature).toFixed(1),
+                "timestamp": new Date
+            })
+        }
     }
 
     Text {
@@ -134,7 +149,14 @@ Item {
         id: protocolFileDialog
         title: qsTr("Speicherort auswählen")
         selectExisting: false
-        onAccepted: brewster.saveProtocol(protocolFileDialog.fileUrl, JSON.stringify(dataModel))
+        onAccepted: {
+            var data = []
+            for(var i = 0; i < dataModel.count; i++) {
+                var entry = dataModel.get(i)
+                data.push(entry)
+            }
+            brewster.saveProtocol(protocolFileDialog.fileUrl, JSON.stringify(data))
+        }
     }
 
     MessageDialog {
