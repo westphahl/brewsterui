@@ -3,8 +3,8 @@ import QtQuick.Controls 1.1
 import QtQuick.Dialogs 1.1
 
 Item {
-    height: 500
-    width: 500
+    height: 600
+    width: 800
 
     Text {
         id: pumpLabel
@@ -126,21 +126,22 @@ Item {
                 "temperature": Number(brewster.temperature).toFixed(1),
                 "timestamp": new Date
             })
+            brewChart.update()
         }
     }
 
     Text {
         id: protocolLabel
-        x: 41
-        y: 292
+        x: 568
+        y: 134
         text: qsTr("Protokoll")
         font.pixelSize: 18
     }
 
     Button {
         id: saveProtocolButton
-        x: 140
-        y: 329
+        x: 667
+        y: 171
         text: qsTr("Speichern...")
         onClicked: protocolFileDialog.open()
     }
@@ -170,9 +171,18 @@ Item {
 
     Button {
         id: clearProtocolButton
-        x: 41
-        y: 329
+        x: 568
+        y: 171
         text: qsTr("Löschen")
         onClicked: clearProtocolDialog.open()
+    }
+
+    BrewChart {
+        id: brewChart
+        x: 41
+        y: 256
+        width: 719
+        height: 308
+        dataModel: dataModel
     }
 }

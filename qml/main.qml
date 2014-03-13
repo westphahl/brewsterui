@@ -5,8 +5,8 @@ import Brewster.UI 1.0
 ApplicationWindow {
     id: applicationWindow
     title: qsTr("Brewster")
-    width: 640
-    height: 480
+    width: 800
+    height: 600
 
     BrewsterClient {
         id: brewster
