@@ -179,10 +179,10 @@ Item {
 
     BrewChart {
         id: brewChart
-        x: 41
-        y: 256
-        width: 719
-        height: 308
+        x: 42
+        y: 300
+        width: parent.width - 82
+        height: parent.height - brewChart.y - 41
         dataModel: dataModel
     }
 }
