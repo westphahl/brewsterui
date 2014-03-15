@@ -121,8 +121,8 @@ Item {
 
         onTriggered: {
             dataModel.append({
-                "pump_state": brewster.pumpState,
-                "heater_level": brewster.heaterOutput,
+                "pumpState": brewster.pumpState,
+                "heaterLevel": brewster.heaterOutput,
                 "temperature": Number(brewster.temperature).toFixed(1),
                 "timestamp": new Date
             })
