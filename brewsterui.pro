@@ -19,7 +19,8 @@ OTHER_FILES += \
     qml/main.qml \
     qml/connectdialog.qml \
     qml/brewsterui.qml \
-    qml/ToggleSwitch.qml
+    qml/ToggleSwitch.qml \
+    qml/BrewChart.qml
 
 RESOURCES += \
     brewsterui.qrc

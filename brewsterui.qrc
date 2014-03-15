@@ -4,5 +4,6 @@
         <file>qml/connectdialog.qml</file>
         <file>qml/brewsterui.qml</file>
         <file>qml/ToggleSwitch.qml</file>
+        <file>qml/BrewChart.qml</file>
     </qresource>
 </RCC>
