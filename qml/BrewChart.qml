@@ -2,9 +2,9 @@ import QtQuick 2.0
 
 Rectangle {
     id: chart
-    width: 100
-    height: 62
-    color: "transparent"
+    width: 500
+    height: 100
+    color: "white"
 
     property var dataModel: null
 
@@ -20,35 +20,50 @@ Rectangle {
         renderTarget: Canvas.FramebufferObject
         antialiasing: true
 
-        onPaint: {
-            var ctx = canvas.getContext("2d")
+        function paintGrid(ctx, unit) {
+            ctx.save()
+            ctx.lineWidth = 1
+            ctx.strokeStyle = "#cccccc";
 
-            ctx.globalCompositeOperation = "source-over"
+            ctx.beginPath()
+            var gridStep = unit * 10
+            for(var y = 0; y <= canvas.height; y = y + gridStep) {
+                ctx.moveTo(0, y)
+                ctx.lineTo(canvas.width, y)
+            }
 
-            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.stroke()
+            ctx.restore()
+        }
 
+        function paintTemperature(ctx, unit) {
             ctx.save()
             ctx.lineWidth = 1
             ctx.strokeStyle = "blue";
 
-            var offset = 0;
-            if (dataModel.count > canvas.width) {
-                offset = dataModel.count - canvas.width
-            }
-
             ctx.beginPath()
-            for(var i = 0; (i + offset) < dataModel.count && i < canvas.width; i++) {
-                var entry = dataModel.get(i+offset)
-                var y = canvas.height - (canvas.height / 100 * entry.temperature)
-                if (i == 0) {
-                    ctx.moveTo(i, y)
+            var endIndex = dataModel.count - 1
+            for(var x = 0; x <= endIndex && x <= canvas.width; x++) {
+                var entry = dataModel.get(endIndex-x)
+                var y = canvas.height - (unit * entry.temperature)
+                if (x == 0) {
+                    ctx.moveTo(canvas.width-x, y)
                 } else {
-                    ctx.lineTo(i, y)
+                    ctx.lineTo(canvas.width-x, y)
                 }
             }
 
             ctx.stroke()
             ctx.restore()
+        }
+
+        onPaint: {
+            var ctx = canvas.getContext("2d")
+            var unit = canvas.height / 100
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            paintGrid(ctx, unit)
+            paintTemperature(ctx, unit)
         }
     }
 }
