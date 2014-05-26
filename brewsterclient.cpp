@@ -1,5 +1,9 @@
 #include "brewsterclient.h"
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QWebSocket>
+#include <QFile>
 #include <QDebug>
 
 BrewsterClient::BrewsterClient(QObject *parent) :
@@ -36,25 +40,20 @@ bool BrewsterClient::pumpState() const
 void BrewsterClient::initialize(QString host, quint16 port)
 {
     qDebug() << Q_FUNC_INFO;
-    socket = new QTcpSocket(this);
-    connect(socket, SIGNAL(readyRead()), this, SLOT(onDataAvailable()));
+    socket = new QWebSocket;
+    connect(socket, &QWebSocket::textMessageReceived, this, &BrewsterClient::handleTextMessage);
+    connect(socket, &QWebSocket::binaryMessageReceived, this, &BrewsterClient::handleBinaryMessage);
+    connect(socket, SIGNAL(connected()), this, SLOT(onConnected()));
     connect(socket, SIGNAL(connected()), this, SIGNAL(initialized()));
-    connect(socket, SIGNAL(error(QAbstractSocket::SocketError)),
-            this, SLOT(onSocketError(QAbstractSocket::SocketError)));
-    socket->connectToHost(host, port);
-}
-
-void BrewsterClient::onSocketError(QAbstractSocket::SocketError socketError)
-{
-    Q_UNUSED(socketError);
-
-    emit error(socket->errorString());
+    socket->open(QUrl(QString("ws://%1:%2").arg(host).arg(port)));
 }
 
 void BrewsterClient::setPumpState(bool pumpState)
 {
-    qDebug() << Q_FUNC_INFO << pumpState;
-    writeSocketData(QVariantList() << (quint8) PumpState << pumpState);
+    QJsonObject message;
+    message.insert("type", PumpState);
+    message.insert("state", pumpState);
+    socket->sendTextMessage(QJsonDocument(message).toJson());
 }
 
 void BrewsterClient::saveProtocol(const QUrl &fileUrl, const QByteArray &json)
@@ -68,10 +67,17 @@ void BrewsterClient::saveProtocol(const QUrl &fileUrl, const QByteArray &json)
     protocolFile.close();
 }
 
+void BrewsterClient::onConnected()
+{
+    qDebug() << Q_FUNC_INFO;
+}
+
 void BrewsterClient::setHeaterOutput(quint8 level)
 {
-    qDebug() << Q_FUNC_INFO << level;
-    writeSocketData(QVariantList() << (quint8) HeaterOutput << level);
+    QJsonObject message;
+    message.insert("type", HeaterOutput);
+    message.insert("level", level);
+    socket->sendTextMessage(QJsonDocument(message).toJson());
 }
 
 void BrewsterClient::setTemperature(float temp)
@@ -79,105 +85,52 @@ void BrewsterClient::setTemperature(float temp)
     Q_UNUSED(temp)
 }
 
-void BrewsterClient::handleMessage(const QVariant &message)
+void BrewsterClient::handleTextMessage(const QString &messageData)
 {
-    QVariantList paramList(message.toList());
+    qDebug() << Q_FUNC_INFO << messageData;
 
-    if (paramList.isEmpty()) {
+    QJsonParseError error;
+    QJsonDocument jsonDocument = QJsonDocument::fromJson(messageData.toUtf8(), &error);
+
+    if (error.error != QJsonParseError::NoError) {
         qWarning() << Q_FUNC_INFO << "Invalid data received";
         return;
     }
 
-    MessageType messageType = (MessageType) paramList.takeFirst().value<quint8>();
+    QJsonObject message = jsonDocument.object();
+    MessageType messageType = static_cast<MessageType>(message.value("type").toInt(Undefined));
+
     switch (messageType) {
     case PumpState: {
-        if (!paramList.isEmpty()) {
-            QVariant pumpState = paramList.takeFirst();
-            if (static_cast<QMetaType::Type>(pumpState.type()) == QMetaType::Bool) {
-                _pumpState = pumpState.toBool();
-                emit pumpStateChanged(_pumpState);
-            }
+        QJsonValue pumpState = message.value("state");
+        if (pumpState.isBool()) {
+            _pumpState = pumpState.toBool();
+            emit pumpStateChanged(_pumpState);
         }
         break;
     }
     case HeaterOutput: {
-        if (!paramList.isEmpty()) {
-            QVariant heaterLevel = paramList.takeFirst();
-            if (static_cast<QMetaType::Type>(heaterLevel.type()) == QMetaType::Int) {
-                _heaterOutput = heaterLevel.toInt();
-                emit heaterOutputChanged(_heaterOutput);
-            }
+        QJsonValue heaterLevel = message.value("level");
+        if (heaterLevel.isDouble()) {
+            _heaterOutput = heaterLevel.toInt();
+            emit heaterOutputChanged(_heaterOutput);
         }
         break;
     }
     case KettleTemperature: {
-        if (!paramList.isEmpty()) {
-            QVariant kettleTemperature = paramList.takeFirst();
-            if (static_cast<QMetaType::Type>(kettleTemperature.type()) == QMetaType::Float) {
-                _temperature = kettleTemperature.toFloat();
-                emit temperatureChanged(_temperature);
-            }
+        QJsonValue kettleTemperature = message.value("temperature");
+        if (kettleTemperature.isDouble()) {
+            _temperature = kettleTemperature.toDouble();
+            emit temperatureChanged(_temperature);
         }
         break;
     }
+    default:
+        qWarning() << "Unknown message type" << messageType;
     }
 }
 
-void BrewsterClient::onDataAvailable()
+void BrewsterClient::handleBinaryMessage(const QByteArray &message)
 {
-    QVariant message;
-    while(readSocketData(message)) {
-        qDebug() << Q_FUNC_INFO << message;
-        handleMessage(message);
-    }
-}
-
-bool BrewsterClient::readSocketData(QVariant &message)
-{
-    QDataStream stream;
-    stream.setDevice(socket);
-    stream.setVersion(QDataStream::Qt_5_2);
-
-    if (messageLength == 0) {
-        if (socket->bytesAvailable() < 4)
-            return false;
-        stream >> messageLength;
-    }
-
-    if (messageLength == 0) {
-        qWarning() << Q_FUNC_INFO << "Message with length 0 received";
-        return false;
-    }
-
-    if (socket->bytesAvailable() < messageLength)
-        return false;
-
-    messageLength = 0;
-    stream >> message;
-
-    if (!message.isValid()) {
-        qWarning() << Q_FUNC_INFO << "Corrupt data received";
-        return false;
-    }
-
-    return true;
-}
-
-void BrewsterClient::writeSocketData(const QVariant &message)
-{
-    if (!socket->isOpen()) {
-        qWarning() << Q_FUNC_INFO << "Server connection closed";
-        return;
-    }
-
-    QDataStream stream;
-    stream.setDevice(socket);
-    stream.setVersion(QDataStream::Qt_5_2);
-
-    QByteArray data;
-    QDataStream out(&data, QIODevice::WriteOnly);
-    out.setVersion(QDataStream::Qt_5_2);
-
-    out << message;
-    stream << data;
+    qDebug() << Q_FUNC_INFO << message;
 }

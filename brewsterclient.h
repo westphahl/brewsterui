@@ -2,9 +2,8 @@
 #define BREWSTERCLIENT_H
 
 #include <QObject>
-#include <QtNetwork>
 
-class QTcpSocket;
+class QWebSocket;
 
 class BrewsterClient : public QObject
 {
@@ -19,7 +18,8 @@ public:
     enum MessageType {
         PumpState = 1,
         HeaterOutput,
-        KettleTemperature
+        KettleTemperature,
+        Undefined = 255
     };
 
     float temperature() const;
@@ -35,25 +35,23 @@ Q_SIGNALS:
 
 public slots:
     void initialize(QString host, quint16 port);
-    void onSocketError(QAbstractSocket::SocketError socketError);
     void setHeaterOutput(quint8 level);
     void setPumpState(bool pumpState);
 
     void saveProtocol(const QUrl &fileUrl, const QByteArray &json);
+    void onConnected();
 
 private slots:
     void setTemperature(float temp);
-    void onDataAvailable();
-    void writeSocketData(const QVariant &message);
-    bool readSocketData(QVariant &message);
-    void handleMessage(const QVariant &message);
+    void handleTextMessage(const QString &messageData);
+    void handleBinaryMessage(const QByteArray &message);
 
 private:
     float _temperature;
     quint8 _heaterOutput;
     bool _pumpState;
 
-    QTcpSocket *socket;
+    QWebSocket *socket;
     quint32 messageLength;
 };
 

@@ -10,7 +10,7 @@ QMAKE_CXXFLAGS += -pipe -fno-exceptions -fstack-protector -Wl,-z,relro -Wl,-z,no
 
 QMAKE_LFLAGS += -Wl,-O1 -Wl,--discard-all -Wl,--no-undefined -rdynamic
 
-QT += qml quick serialport
+QT += qml quick websockets
 
 HEADERS += \
     brewsterclient.h
